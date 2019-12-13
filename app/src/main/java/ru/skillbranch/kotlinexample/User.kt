@@ -38,12 +38,7 @@ class User private constructor(
         }
     get() = _login!!
 
-    private var _salt: String? = null
-    private val _generatedSalt by lazy {
-        ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
-    }
-
-    private lateinit var salt: String
+    private var salt = ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
 
     private lateinit var passwordHash: String
 
@@ -81,8 +76,7 @@ class User private constructor(
         passwordHash: String
     ): this (firstName, lastName, email, phone, mapOf("src" to "csv")) {
         this.passwordHash = passwordHash
-        _salt = salt
-        encrypt("")
+        this.salt = salt
     }
 
     init {
@@ -122,7 +116,6 @@ class User private constructor(
 
 
     private fun encrypt(password: String): String {
-        salt = _salt ?: _generatedSalt
         return salt.plus(password).md5()
     }
 
