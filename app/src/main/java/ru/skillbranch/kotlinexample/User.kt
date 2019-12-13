@@ -122,7 +122,7 @@ class User private constructor(
     private fun String.md5(): String {
         val md = MessageDigest.getInstance("MD5")
         val digest = md.digest(toByteArray())
-        val hexString = BigInteger(1, digest).toString()
+        val hexString = BigInteger(1, digest).toString(16)
         return hexString.padStart(32, '0')
     }
 
