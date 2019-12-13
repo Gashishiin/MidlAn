@@ -109,7 +109,7 @@ class User private constructor(
 
     fun changePassword(oldPass: String, newPass: String) {
         if (checkPassword(oldPass)) passwordHash = encrypt(newPass)
-        else IllegalArgumentException("The entered password does not match the current password")
+        else throw IllegalArgumentException("The entered password does not match the current password")
     }
 
     fun requestAccessCode() {
