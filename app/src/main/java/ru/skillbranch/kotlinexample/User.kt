@@ -34,7 +34,7 @@ class User private constructor(
     private var _login: String? = null
     var login: String
         set(value) {
-            _login = value?.toLowerCase()
+            _login = value.trim().toLowerCase()
         }
     get() = _login!!
 
@@ -82,6 +82,7 @@ class User private constructor(
     ): this (firstName, lastName, email, phone, mapOf("src" to "csv")) {
         this.passwordHash = passwordHash
         _salt = salt
+        encrypt("")
     }
 
     init {
