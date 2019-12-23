@@ -48,6 +48,7 @@
         app:layout_dodgeInsetEdges="bottom"
         android:visibility="gone"
         tools:visibility="visible"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         />
     <ru.skillbranch.skillarticles.ui.custom.Bottombar
         android:id="@+id/bottombar"
@@ -57,6 +58,8 @@
         android:theme="@style/ArticleBarsTheme"
         android:elevation="4dp"
         app:layout_insetEdge="bottom"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
