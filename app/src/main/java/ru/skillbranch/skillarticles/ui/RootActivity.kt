@@ -2,6 +2,7 @@ package ru.skillbranch.skillarticles.ui
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -41,13 +42,51 @@ class RootActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_search, menu)
+        val searchItem = menu?.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as SearchView
+        if (viewModel.currentState.isSearch) {
+            searchItem.expandActionView()
+            searchView.setQuery(viewModel.currentState.searchQuery,false)
+        }
+
+        searchItem.setOnActionExpandListener(object: MenuItem.OnActionExpandListener{
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                viewModel.handleSearchMode(true)
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                viewModel.handleSearchMode(false)
+                return true
+            }
+        })
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.handleSearch(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.handleSearch(newText)
+                return true
+            }
+
+        })
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     private fun renderNotification(notify: Notify) {
         val snackbar = Snackbar.make(coordinator_container, notify.message, Snackbar.LENGTH_LONG)
             .setAnchorView(bottombar)
             .setActionTextColor(getColor(R.color.color_accent_dark))
 
         when (notify) {
-            is Notify.TextMessage -> {}
+            is Notify.TextMessage -> {
+            }
 
             is Notify.ActionMessage -> {
                 snackbar.setActionTextColor(getColor(R.color.color_accent_dark))
@@ -72,16 +111,16 @@ class RootActivity : AppCompatActivity() {
     }
 
     private fun setupSubmenu() {
-        btn_text_down.setOnClickListener{viewModel.handleDownText()}
-        btn_text_up.setOnClickListener{viewModel.handleUpText()}
-        switch_mode.setOnClickListener{viewModel.handleNightMode()}
+        btn_text_down.setOnClickListener { viewModel.handleDownText() }
+        btn_text_up.setOnClickListener { viewModel.handleUpText() }
+        switch_mode.setOnClickListener { viewModel.handleNightMode() }
     }
 
     private fun setupBottomBar() {
-        btn_like.setOnClickListener{viewModel.handleLike()}
-        btn_bookmark.setOnClickListener{viewModel.handleBookmark()}
-        btn_share.setOnClickListener{viewModel.handleShare()}
-        btn_settings.setOnClickListener{viewModel.handleToggleMenu()}
+        btn_like.setOnClickListener { viewModel.handleLike() }
+        btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
+        btn_share.setOnClickListener { viewModel.handleShare() }
+        btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
     }
 
     private fun renderUi(data: ArticleState) {
@@ -105,11 +144,12 @@ class RootActivity : AppCompatActivity() {
             btn_text_down.isChecked = true
         }
 
-        tv_text_content.text = if (data.isLoadingContent) "loading" else data.content.first() as String
+        tv_text_content.text =
+            if (data.isLoadingContent) "loading" else data.content.first() as String
 
         toolbar.title = data.title ?: "loading"
         toolbar.subtitle = data.category ?: "loading"
-        if(data.categoryIcon!=null) toolbar.logo = getDrawable(data.categoryIcon as Int)
+        if (data.categoryIcon != null) toolbar.logo = getDrawable(data.categoryIcon as Int)
     }
 
     private fun setupToolbar() {
