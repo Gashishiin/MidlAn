@@ -22,7 +22,7 @@ class RenderProp <T>(
     override fun getValue(thisRef: Binding, property: KProperty<*>): T = value
 
     override fun setValue(thisRef: Binding, property: KProperty<*>, value: T) {
-        if (value == null) return
+        if (this.value == value) return
         this.value = value
         onChange?.invoke(this.value)
         if(listeners.isNotEmpty()) listeners.forEach{it.invoke()}
