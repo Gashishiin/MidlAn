@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.viewmodels
 
-import android.util.Log
+import android.os.Bundle
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
@@ -8,14 +9,18 @@ import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.extensions.indexesOf
+import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
+import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
-class ArticleViewModel(private val articleId: String):
+class ArticleViewModel(private val articleId: String) :
     BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
 
     private val repository = ArticleRepository
 
     init {
-        subscribeOnDataSource(getArticleData()) {article, state ->
+        subscribeOnDataSource(getArticleData()) { article, state ->
             article ?: return@subscribeOnDataSource null
             state.copy(
                 shareLink = article.shareLink,
@@ -27,7 +32,7 @@ class ArticleViewModel(private val articleId: String):
             )
         }
 
-        subscribeOnDataSource(getArticleContent()) {content, state ->
+        subscribeOnDataSource(getArticleContent()) { content, state ->
             content ?: return@subscribeOnDataSource null
             state.copy(
                 isLoadingContent = false,
@@ -35,7 +40,7 @@ class ArticleViewModel(private val articleId: String):
             )
         }
 
-        subscribeOnDataSource(getArticlePersonalInfo()) {info, state ->
+        subscribeOnDataSource(getArticlePersonalInfo()) { info, state ->
             info ?: return@subscribeOnDataSource null
             state.copy(
                 isBookmark = info.isBookmark,
@@ -43,7 +48,7 @@ class ArticleViewModel(private val articleId: String):
             )
         }
 
-        subscribeOnDataSource(repository.getAppSettings()){settings, state ->
+        subscribeOnDataSource(repository.getAppSettings()) { settings, state ->
             state.copy(
                 isDarkMode = settings.isDarkMode,
                 isBigText = settings.isBigText
@@ -116,11 +121,22 @@ class ArticleViewModel(private val articleId: String):
     }
 
     override fun handleSearchMode(isSearch: Boolean) {
-        updateState { it.copy(isSearch = isSearch) }
+        updateState { it.copy(isSearch = isSearch, isShowMenu = false, searchPosition = 0) }
     }
 
     override fun handleSearch(query: String?) {
-        updateState { it.copy(searchQuery = query) }
+        query ?: return
+        val result = (currentState.content.firstOrNull() as? String).indexesOf(query)
+            .map { it to it + query.length }
+        updateState { it.copy(searchQuery = query, searchResults = result) }
+    }
+
+    fun handleUpResult() {
+        updateState { it.copy(searchPosition = it.searchPosition.dec()) }
+    }
+
+    fun handleDownResult() {
+        updateState { it.copy(searchPosition = it.searchPosition.inc()) }
     }
 }
 
@@ -146,5 +162,26 @@ data class ArticleState(
     val poster: String? = null,
     val content: List<Any> = emptyList(),
     val reviews: List<Any> = emptyList()
-)
+) : IViewModelState {
+    override fun save(outState: Bundle) {
+        outState.putAll(
+            bundleOf(
+                "isSearch" to isSearch,
+                "searchQuery" to searchQuery,
+                "searchResults" to searchResults,
+                "searchPosition" to searchPosition
+            )
+        )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun restore(savedState: Bundle): ArticleState {
+        return copy(
+            isSearch = savedState["isSearch"] as Boolean,
+            searchQuery = savedState["searchQuery"] as? String,
+            searchResults = savedState["searchResults"] as List<Pair<Int, Int>>,
+            searchPosition = savedState["searchPosition"] as Int
+        )
+    }
+}
 
