@@ -8,12 +8,15 @@ import kotlin.reflect.KProperty
 
 class ViewModelDelegate<T : ViewModel>(private val clazz: Class<T>, private val arg: Any?) :
     ReadOnlyProperty<FragmentActivity, T> {
-
     private var value: T? = null
     override fun getValue(thisRef: FragmentActivity, property: KProperty<*>): T {
         if (value == null) {
-            val vmFactory = ViewModelFactory(arg ?: "")
-            this.value = ViewModelProviders.of(thisRef, vmFactory).get(clazz)
+            if (arg == null) {
+                value =  ViewModelProviders.of(thisRef).get(clazz)
+            } else {
+                val vmFactory = ViewModelFactory(arg)
+                value = ViewModelProviders.of(thisRef, vmFactory).get(clazz)
+            }
         }
         return value!!
     }
