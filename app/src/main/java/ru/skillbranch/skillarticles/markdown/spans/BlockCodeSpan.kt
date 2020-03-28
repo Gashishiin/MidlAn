@@ -39,23 +39,40 @@ class BlockCodeSpan(
             when(type) {
                 Element.BlockCode.Type.SINGLE -> {
                     rect.set(0f, top.toFloat() + padding, canvas.width.toFloat(), bottom.toFloat() - padding)
+                    canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
                 }
                 Element.BlockCode.Type.START -> {
                     rect.set(0f, top.toFloat() + padding, canvas.width.toFloat(), bottom.toFloat())
-                    drawBottomCorners(canvas, paint)
+                    path.reset()
+                    path.addRoundRect(rect,
+                        floatArrayOf(
+                            cornerRadius, cornerRadius,
+                            cornerRadius, cornerRadius,
+                            0f, 0f,
+                            0f, 0f
+                        ),
+                        Path.Direction.CW
+                        )
+                    canvas.drawPath(path, paint)
                 }
                 Element.BlockCode.Type.MIDDLE -> {
                     rect.set(0f, top.toFloat(), canvas.width.toFloat(), bottom.toFloat())
-                    drawBottomCorners(canvas, paint)
-                    drawTopCorners(canvas, paint)
                 }
                 Element.BlockCode.Type.END -> {
                     rect.set(0f, top.toFloat(), canvas.width.toFloat(), bottom.toFloat() - padding)
-                    drawTopCorners(canvas, paint)
+                    path.reset()
+                    path.addRoundRect(rect,
+                        floatArrayOf(
+                            0f, 0f,
+                            0f, 0f,
+                            cornerRadius, cornerRadius,
+                            cornerRadius, cornerRadius
+                        ),
+                        Path.Direction.CW
+                    )
+                    canvas.drawPath(path, paint)
                 }
             }
-
-            canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
         }
 
         paint.forText {
@@ -73,11 +90,11 @@ class BlockCodeSpan(
         fm ?: return 0
         when (type) {
             Element.BlockCode.Type.SINGLE -> {
-                fm.ascent = fm.ascent - 2 * padding.toInt()
-                fm.descent= fm.descent + 2 * padding.toInt()
+                fm.ascent = (paint.ascent() - 2 * padding).toInt()
+                fm.descent= (paint.descent() + 2* padding).toInt()
             }
             Element.BlockCode.Type.START -> {
-                fm.ascent = fm.ascent - 2 * padding.toInt()
+                fm.ascent = (paint.ascent() - 2 *  padding).toInt()
                 fm.descent = paint.descent().toInt()
             }
             Element.BlockCode.Type.MIDDLE -> {
@@ -86,7 +103,7 @@ class BlockCodeSpan(
             }
             Element.BlockCode.Type.END -> {
                 fm.ascent = paint.ascent().toInt()
-                fm.descent= fm.descent + 2 * padding.toInt()
+                fm.descent= (paint.descent() + 2 * padding).toInt()
             }
         }
         return 0
@@ -120,35 +137,5 @@ class BlockCodeSpan(
         color = oldColor
         typeface = oldFont
         textSize = oldSize
-    }
-
-    private fun drawBottomCorners(canvas: Canvas, paint: Paint) {
-        path.reset()
-        path.moveTo(rect.left, rect.bottom)
-        path.lineTo(rect.left, rect.bottom - cornerRadius)
-        path.lineTo(rect.left + cornerRadius, rect.bottom)
-        canvas.drawPath(path, paint)
-
-        path.reset()
-        path.moveTo(rect.right, rect.bottom)
-        path.lineTo(rect.right, rect.bottom - cornerRadius)
-        path.lineTo(rect.right - cornerRadius, rect.bottom)
-        canvas.drawPath(path, paint)
-
-    }
-
-    private fun drawTopCorners(canvas: Canvas, paint: Paint) {
-        path.reset()
-        path.moveTo(rect.left, rect.top)
-        path.lineTo(rect.left, rect.top + cornerRadius)
-        path.lineTo(rect.left + cornerRadius, rect.top)
-        canvas.drawPath(path, paint)
-
-        path.reset()
-        path.moveTo(rect.right, rect.top)
-        path.lineTo(rect.right, rect.top + cornerRadius)
-        path.lineTo(rect.right - cornerRadius, rect.top)
-        canvas.drawPath(path, paint)
-
     }
 }
