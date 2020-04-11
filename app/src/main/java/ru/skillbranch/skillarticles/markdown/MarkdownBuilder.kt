@@ -10,9 +10,11 @@ import android.text.style.URLSpan
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.data.repositories.Element
+import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToPx
-import ru.skillbranch.skillarticles.markdown.spans.*
+import ru.skillbranch.skillarticles.ui.custom.spans.*
 
 class MarkdownBuilder(context: Context) {
     private val colorSecondary = context.attrValue(R.attr.colorSecondary)
@@ -20,6 +22,7 @@ class MarkdownBuilder(context: Context) {
     private val colorDivider = context.getColor(R.color.color_divider)
     private val colorOnSurface = context.attrValue(R.attr.colorOnSurface)
     private val colorSurface = context.attrValue(R.attr.colorSurface)
+    private val opacityColorSurface = context.getColor(R.color.opacity_color_surface)
     private val gap: Float = context.dpToPx(8)
     private val bulletRadius = context.dpToPx(4)
     private val strikeWidth = context.dpToPx(4)
@@ -27,12 +30,13 @@ class MarkdownBuilder(context: Context) {
     private val headerMarginBottom = context.dpToPx(8)
     private val ruleWidth = context.dpToPx(2)
     private val cornerRadius = context.dpToPx(8)
-    private val linkIcon = context.getDrawable(R.drawable.ic_link_black_24dp)!!
+    private val linkIcon = context.getDrawable(R.drawable.ic_link_black_24dp)!!.apply{
+         setTint(colorSecondary)
+    }
 
-    fun markdownToSpan(string: String): SpannedString {
-        val markDown = MarkdownParser.parse(string)
+    fun markdownToSpan(textContent: MarkdownElement.Text): SpannedString {
         return buildSpannedString {
-            markDown.elements.forEach { buildElement(it, this) }
+            textContent.elements.forEach { buildElement(it, this) }
         }
     }
 
@@ -101,16 +105,8 @@ class MarkdownBuilder(context: Context) {
 
                 is Element.Link -> {
                     inSpans(
-                        IconLinkSpan(linkIcon, colorSecondary, gap, colorPrimary, strikeWidth),
+                        IconLinkSpan(linkIcon, gap, colorPrimary, strikeWidth),
                         URLSpan(element.link)
-                    ) {
-                        append(element.text)
-                    }
-                }
-
-                is Element.BlockCode -> {
-                    inSpans(
-                        BlockCodeSpan(colorOnSurface, colorSurface, cornerRadius, gap, element.type)
                     ) {
                         append(element.text)
                     }

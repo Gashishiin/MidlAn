@@ -14,32 +14,31 @@
         android:layout_height="wrap_content">
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
+            android:theme="@style/ArticleBarsTheme"
             style="@style/ArticleToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:theme="@style/ArticleBarsTheme"
             app:logo="@drawable/logo_placeholder"
             app:title="@string/app_name"
-            app:subtitle="Loading..."
+            app:subtitle="loading..."
             app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
-            android:elevation="4dp">
-        </com.google.android.material.appbar.MaterialToolbar>
+            android:elevation="4dp"/>
     </com.google.android.material.appbar.AppBarLayout>
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-        <TextView
+        <ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownContentView
             android:id="@+id/tv_text_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:padding="16dp"
             android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:saveEnabled="false"
-            android:text="Loading..."/>
+            android:clipToPadding="false"
+            android:focusableInTouchMode="true"/>
     </androidx.core.widget.NestedScrollView>
+
     <ru.skillbranch.skillarticles.ui.custom.ArticleSubmenu
         android:id="@+id/submenu"
         android:theme="@style/ArticleBarsTheme"
@@ -51,9 +50,8 @@
         android:layout_marginBottom="8dp"
         app:layout_dodgeInsetEdges="bottom"
         android:visibility="gone"
-        tools:visibility="visible"
+        tools:visibility="visible"/>
 
-        />
     <ru.skillbranch.skillarticles.ui.custom.Bottombar
         android:id="@+id/bottombar"
         android:layout_width="match_parent"
@@ -61,9 +59,6 @@
         android:layout_gravity="bottom"
         android:theme="@style/ArticleBarsTheme"
         android:elevation="4dp"
-        app:layout_insetEdge="bottom"
-
-
-        />
+        app:layout_insetEdge="bottom"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

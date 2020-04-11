@@ -22,3 +22,12 @@ fun View.setMarginOptionally(left:Int = marginLeft,
 inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() -> Unit) {
     if (layoutParams is T) block(layoutParams as T)
 }
+
+fun View.setPaddingOptionally(
+    left: Int = paddingLeft,
+    right: Int = paddingRight,
+    top: Int = paddingTop,
+    bottom: Int = paddingBottom
+) {
+    setPadding(left, top, right, bottom)
+}
