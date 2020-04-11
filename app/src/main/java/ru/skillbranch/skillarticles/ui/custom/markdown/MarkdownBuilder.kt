@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.markdown
+package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import android.content.Context
 import android.graphics.Typeface

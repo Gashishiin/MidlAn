@@ -10,7 +10,6 @@ import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.groupByBounds
 import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
-import ru.skillbranch.skillarticles.markdown.MarkdownBuilder
 import kotlin.properties.Delegates
 
 class MarkdownContentView @JvmOverloads constructor(
@@ -83,7 +82,9 @@ class MarkdownContentView @JvmOverloads constructor(
                         setLineSpacing(fontSize * 0.5f, 1f)
                     }
 
-                    MarkdownBuilder(context)
+                    MarkdownBuilder(
+                        context
+                    )
                         .markdownToSpan(it)
                         .run{
                             tv.setText(this, TextView.BufferType.SPANNABLE)
